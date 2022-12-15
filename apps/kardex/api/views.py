@@ -1,6 +1,6 @@
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
+
 from apps.kardex.api.serializer import *
 from apps.kardex.models import *
 from apps.products.models import Product

@@ -1,5 +1,3 @@
-from django.template.backends import django
-
 from Backend.settings import *
 
 # Database
@@ -22,6 +20,7 @@ OWN_APPS = [
     'apps.kardex'
 ]
 INSTALLED_APPS = FIRST_APPS + THIRD_APPS + OWN_APPS
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
@@ -32,4 +31,3 @@ DATABASES = {
         'PORT': '5432',
     }
 }
-# Database Config

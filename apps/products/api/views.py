@@ -1,10 +1,11 @@
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import status
+from rest_framework.generics import CreateAPIView
 from rest_framework.response import Response
-from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
+
 from apps.products.api.serializer import *
 from apps.products.models import *
-from django_filters.rest_framework import DjangoFilterBackend
 
 
 class CategoryViewSet(ModelViewSet):
@@ -42,11 +43,47 @@ class ProductViewSet(ModelViewSet):
 class ExpirationViewSet(ModelViewSet):
     model = Expiration
     serializer_class = ExpirationSerializer
-    queryset = Expiration.objects.all()
+    queryset = Expiration.objects.filter()
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['product', 'dateExpiration']
 
 
-class ExpirationCustomViewSet(APIView):
+# Here we use the CrateAPIView to have the 'form' format by Swagger and DRF (only crate)
+class ExpirationCustomViewSet(CreateAPIView):
+    serializer_class = ExpirationCustomSerializer
 
-    def post(self, request):
-        results = ExperitarionCustomnSerializer(data=request.data)
-        return Response({'data': results.data}, status=status.HTTP_200_OK)
+    # Post method customized
+    def post(self, request, *args, **kwargs):
+        # Receive the data customized by Serializer
+        serializer = ExpirationCustomSerializer(data=request.data)
+        # We validated the format
+        if serializer.is_valid():
+            # Verify the product exist
+            try:
+                # Get product sent
+                product = Product.objects.get(pk=serializer.data.pop('product'))
+            except Product.DoesNotExist:
+                return Response(
+                    {
+                        'message': 'Product does not exist',
+                        'product': serializer.data.pop('product')
+                    }, status=status.HTTP_400_BAD_REQUEST)
+
+            # Obtain the list data in details
+            criteria_data = serializer.data.pop('details')
+            # Gets each element of the previous list
+            for track_data in criteria_data:
+                # Create the expiration object with product
+                Expiration.objects.create(product=product, **track_data)
+
+            return Response(
+                {
+                    'message': 'Expiration by products create correctly.',
+                    'data': serializer.data
+                }, status=status.HTTP_201_CREATED)
+
+        return Response(
+            {
+                'message': 'No valid data',
+                'data': serializer.data
+            }, status=status.HTTP_400_BAD_REQUEST)

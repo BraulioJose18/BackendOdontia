@@ -16,6 +16,8 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from rest_framework import routers, permissions
+
+from apps.products.api.views import ExpirationCustomViewSet
 from apps.user.api.urls import router as user_router
 from apps.products.api.urls import router as product_router
 from apps.kardex.api.urls import router as kardex_router
@@ -54,9 +56,14 @@ router.extend(kardex_router)
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include(router.urls)),
+    # path('', include('apps.user.api.urls')),
+    # path('', include('apps.products.api.urls')),
+    # path('', include('apps.kardex.api.urls')),
     path('api/auth/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/auth/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
-    ]
+    # Custom view create in app product
+    path('api/product/expiration/custom/', ExpirationCustomViewSet.as_view())
+]
 
 # Swagger and redoc documentation
 urlpatterns += [

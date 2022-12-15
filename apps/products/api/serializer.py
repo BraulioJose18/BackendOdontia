@@ -1,9 +1,7 @@
-from django.http import JsonResponse
 from rest_framework import serializers
-from rest_framework.renderers import JSONRenderer
 
 from apps.products.models import *
-from datetime import datetime
+
 
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
@@ -48,13 +46,9 @@ class ProductSerializer(serializers.ModelSerializer):
 
 
 class ExpirationSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = Expiration
         fields = '__all__'
-
-    def create(self, validated_data):
-        detailExpiration = validated_data.pop('')
 
     def to_representation(self, obj):
         if 'branches' not in self.fields:
@@ -62,8 +56,13 @@ class ExpirationSerializer(serializers.ModelSerializer):
         return super(ExpirationSerializer, self).to_representation(obj)
 
 
-class ExperitarionCustomnSerializer(serializers.Serializer):
+# This serializer will allow us to customize our list field
+class CustomExpirationSerializer(serializers.Serializer):
+    dateExpiration = serializers.DateField()
+    quantity = serializers.IntegerField()
 
+
+# This is the serializer we will use in our custom CreateView, here have the personalized fields to use
+class ExpirationCustomSerializer(serializers.Serializer):
     product = serializers.IntegerField()
-    detailExpiration = ExpirationSerializer(many=True)
-
+    details = serializers.ListField(child=CustomExpirationSerializer())
