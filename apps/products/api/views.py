@@ -1,11 +1,14 @@
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import status
-from rest_framework.generics import CreateAPIView
+from rest_framework.generics import CreateAPIView, UpdateAPIView, ListAPIView
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 
 from apps.products.api.serializer import *
+from apps.products.api.utils import CustomExpirationProduct
 from apps.products.models import *
+
+from django.db import connection
 
 
 class CategoryViewSet(ModelViewSet):
@@ -87,3 +90,36 @@ class ExpirationCustomViewSet(CreateAPIView):
                 'message': 'No valid data',
                 'data': serializer.data
             }, status=status.HTTP_400_BAD_REQUEST)
+
+
+class ExpirationUpdateCustomViewSet(UpdateAPIView):
+    serializer_class = ExpirationCustomSerializer
+
+    def patch(self, request, *args, **kwargs):
+        serializer = ExpirationCustomSerializer(data=request.data)
+
+        if serializer.is_valid():
+            product = Product.objects.get(pk=serializer.data.pop('product'))
+            expiration = Expiration.objects.filter(product=product)
+            print(expiration)
+
+        return Response(
+            {
+                'message': '200',
+                'data': 'ASDA'
+            }, status=status.HTTP_200_OK)
+
+
+class AllExpirationListViewSet(ListAPIView):
+
+    def get(self, request, *args, **kwargs):
+        cursor = connection.cursor()
+        cursor.callproc('GET_ALL_PRODUCTS_WITH_DIFERENT_STOCK')
+        all_product_stock_diferent = cursor.fetchall()
+        obj_all_product_stock_diferent = [CustomExpirationProduct(*x) for x in all_product_stock_diferent]
+        json = ExampleExpirationGroupByProductSerializer(obj_all_product_stock_diferent, many=True).data
+        return Response(
+            {
+                'message': '200',
+                'data': json
+            }, status=status.HTTP_200_OK)

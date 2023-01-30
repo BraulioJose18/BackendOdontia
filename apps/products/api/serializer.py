@@ -66,3 +66,16 @@ class CustomExpirationSerializer(serializers.Serializer):
 class ExpirationCustomSerializer(serializers.Serializer):
     product = serializers.IntegerField()
     details = serializers.ListField(child=CustomExpirationSerializer())
+
+
+class ExampleExpirationGroupByProductSerializer(serializers.Serializer):
+    id_product = serializers.IntegerField()
+    name_product = serializers.CharField(max_length=256)
+    stock_product = serializers.IntegerField()
+    stock_expiration = serializers.IntegerField()
+
+
+class AllExpirationList(serializers.Serializer):
+    product = serializers.ListField(child=ProductSerializer())
+    expiration = serializers.ListField(child=ExpirationSerializer())
+

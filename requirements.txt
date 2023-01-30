@@ -9,3 +9,4 @@ django-filter==22.1
 djangorestframework-simplejwt==5.2.1
 drf-yasg==1.21.4 # Libreary for swagger and redoc
 django-cors-headers==3.11.0
+pymysql==1.0.2

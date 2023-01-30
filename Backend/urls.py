@@ -17,7 +17,7 @@ from django.contrib import admin
 from django.urls import path, include
 from rest_framework import routers, permissions
 
-from apps.products.api.views import ExpirationCustomViewSet
+from apps.products.api.views import ExpirationCustomViewSet, ExpirationUpdateCustomViewSet, AllExpirationListViewSet
 from apps.user.api.urls import router as user_router
 from apps.products.api.urls import router as product_router
 from apps.kardex.api.urls import router as kardex_router
@@ -62,7 +62,9 @@ urlpatterns = [
     path('api/auth/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/auth/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     # Custom view create in app product
-    path('api/product/expiration/custom/', ExpirationCustomViewSet.as_view())
+    path('api/product/expiration/custom/', ExpirationCustomViewSet.as_view()),
+    path('api/product/expiration/customUpdate', ExpirationUpdateCustomViewSet.as_view()),
+    path('api/product/expiration/all', AllExpirationListViewSet.as_view())
 ]
 
 # Swagger and redoc documentation
