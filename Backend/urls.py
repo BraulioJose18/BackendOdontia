@@ -17,7 +17,8 @@ from django.contrib import admin
 from django.urls import path, include
 from rest_framework import routers, permissions
 
-from apps.products.api.views import ExpirationCustomViewSet, ExpirationUpdateCustomViewSet, AllExpirationListViewSet
+from apps.products.api.views import ExpirationCustomViewSet, ExpirationUpdateCustomViewSet, AllExpirationListViewSet, \
+    CreatePacksViewSet
 from apps.user.api.urls import router as user_router
 from apps.products.api.urls import router as product_router
 from apps.kardex.api.urls import router as kardex_router
@@ -64,11 +65,13 @@ urlpatterns = [
     # Custom view create in app product
     path('api/product/expiration/custom/', ExpirationCustomViewSet.as_view()),
     path('api/product/expiration/customUpdate', ExpirationUpdateCustomViewSet.as_view()),
-    path('api/product/expiration/all', AllExpirationListViewSet.as_view())
+    path('api/product/expiration/all', AllExpirationListViewSet.as_view()),
+    path('api/product/createPack', CreatePacksViewSet.as_view())
 ]
 
 # Swagger and redoc documentation
 urlpatterns += [
     path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
-    path('redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc')
+    path('redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
+    path("api-auth/", include("rest_framework.urls"))
 ]

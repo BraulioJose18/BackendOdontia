@@ -92,6 +92,41 @@ class Product(models.Model):
         return self.name
 
 
+class PackHeader(models.Model):
+    id = models.AutoField(primary_key=True)
+    name = models.CharField(max_length=156)
+    status = models.BooleanField()
+    subcategory = models.ForeignKey(SubCategory, on_delete=models.CASCADE)
+    measurementUnit = models.ForeignKey(MeasurementUnit, on_delete=models.CASCADE)
+    brand = models.ForeignKey(Brand, on_delete=models.CASCADE)
+    salePrice = models.FloatField()
+    specifications = models.CharField(max_length=156)
+    observation = models.CharField(max_length=156)
+    stock = models.IntegerField(default=0)
+
+    class Meta:
+        db_table = 'pack'
+        abstract = False  # Clase abstracta :'v
+        verbose_name = 'Pack'  # Como se muestra papi
+        verbose_name_plural = 'Packs'  # ? :v
+
+    # To String
+    def __str__(self):
+        return self.name
+
+
+class PackDetail(models.Model):
+    packHeader = models.ForeignKey(PackHeader, on_delete=models.CASCADE, related_name='detail', blank=False, null=True)
+    quantity = models.IntegerField()
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, blank=True, null=True)
+
+    class Meta:
+        db_table = 'packdetail'
+        abstract = False  # Clase abstracta :'v
+        verbose_name = 'PackDetail'  # Como se muestra papi
+        verbose_name_plural = 'PackDetails'  # ? :v
+
+
 class Expiration(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, blank=True, null=True)
     dateExpiration = models.DateField(blank=True, null=True)

@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from rest_framework.exceptions import ValidationError
 
 from apps.products.models import *
 
@@ -78,4 +79,72 @@ class ExampleExpirationGroupByProductSerializer(serializers.Serializer):
 class AllExpirationList(serializers.Serializer):
     product = serializers.ListField(child=ProductSerializer())
     expiration = serializers.ListField(child=ExpirationSerializer())
+
+
+class CustomPackStockProductSerializer(serializers.Serializer):
+    quantity = serializers.IntegerField()
+    product = serializers.IntegerField()
+
+
+class CreatePacksSerializer(serializers.Serializer):
+    name = serializers.CharField(max_length=156)
+    status = serializers.BooleanField()
+    subcategory = serializers.IntegerField()
+    measurementUnit = serializers.IntegerField()
+    brand = serializers.IntegerField()
+    salePrice = serializers.FloatField()
+    purchasePrice = serializers.FloatField()
+    specifications = serializers.CharField(max_length=156)
+    observation = serializers.CharField(max_length=156)
+    stock = serializers.IntegerField(default=0)
+    # Stock Minimo
+    minimumStock = serializers.IntegerField(default=0)
+    # Stock Medio
+    averageStock = serializers.IntegerField(default=0)
+    hasExpiration = serializers.BooleanField(default=False)
+    detailsProduct = serializers.ListField(child=CustomPackStockProductSerializer())
+
+
+class PackDetailSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PackDetail
+        fields = '__all__'
+
+    def create(self, validated_data):
+        instance = super().create(validated_data)
+        totalQuantity = instance.packHeader.stock
+        product = instance.product
+        quantity = instance.quantity * totalQuantity
+        product.stock -= quantity
+        product.save()
+        return instance
+
+
+class PackHeaderSerializer(serializers.ModelSerializer):
+    detail = PackDetailSerializer(many=True)
+
+    class Meta:
+        model = PackHeader
+        fields = '__all__'
+
+    def to_representation(self, obj):
+        if 'branches' not in self.fields:
+            self.fields['subcategory'] = SubCategorySerializer(obj, many=False)
+            self.fields['measurementUnit'] = MeasurementUnitSerializer(obj, many=False)
+            self.fields['brand'] = BrandSerializer(obj, many=False)
+        return super(PackHeaderSerializer, self).to_representation(obj)
+
+    def create(self, validated_data):
+        pack_data = validated_data.pop('detail')
+        instance = super().create(validated_data)
+        for track_data in pack_data:
+            track_data['packHeader'] = instance.id
+            track_data['product'] = track_data['product'].id
+            packDetailSerializer = PackDetailSerializer(data=track_data)
+            packDetailSerializer.is_valid(raise_exception=True)
+            packDetailSerializer.save()
+        return instance
+
+
+
 

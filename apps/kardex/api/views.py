@@ -17,7 +17,8 @@ class KardexHeaderViewSet(ModelViewSet):
     serializer_class = KardexHeaderSerializer
     queryset = KardexHeader.objects.all()
     filter_backends = [DjangoFilterBackend]
-    filterset_fields =['movementType']
+    filterset_fields = ['movementType']
+
 
 class KardexDetailViewSet(ModelViewSet):
     product = Product.objects.filter()

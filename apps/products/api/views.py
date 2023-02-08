@@ -101,7 +101,6 @@ class ExpirationUpdateCustomViewSet(UpdateAPIView):
         if serializer.is_valid():
             product = Product.objects.get(pk=serializer.data.pop('product'))
             expiration = Expiration.objects.filter(product=product)
-            print(expiration)
 
         return Response(
             {
@@ -123,3 +122,47 @@ class AllExpirationListViewSet(ListAPIView):
                 'message': '200',
                 'data': json
             }, status=status.HTTP_200_OK)
+
+
+class CreatePacksViewSet(CreateAPIView):
+    serializer_class = CreatePacksSerializer
+
+    def post(self, request, *args, **kwargs):
+        serializer = CreatePacksSerializer(data=request.data)
+        if serializer.is_valid():
+            #Pack sin
+            # Obtain the list data in details
+            criteria_data = serializer.data.pop('detailsProduct')
+            instancePack = serializer.data
+            instancePack.pop('detailsProduct')
+            pack = instancePack
+            print(pack)
+            # Gets each element of the previous list
+            for track_data in criteria_data:
+                print(track_data)
+            return Response(
+                {
+                    'message': '',
+                    'data': serializer.data
+                }, status=status.HTTP_201_CREATED)
+
+        return Response(
+            {
+                'message': '',
+                'data': serializer.data
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+
+class PackHeaderViewSet(ModelViewSet):
+    model = PackHeader
+    serializer_class = PackHeaderSerializer
+    queryset = PackHeader.objects.all()
+    filter_backends = [DjangoFilterBackend]
+
+
+class PackDetailsViewSet(ModelViewSet):
+    model = PackDetail
+    serializer_class = PackDetailSerializer
+    queryset = PackDetail.objects.all()
+    filter_backends = [DjangoFilterBackend]
+

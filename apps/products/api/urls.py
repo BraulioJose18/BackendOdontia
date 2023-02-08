@@ -10,6 +10,8 @@ router.register(r'api/brand', BrandViewSet, basename='Brand')
 router.register(r'api/measurement_unit', MeasurementUnitViewSet, basename='MeasurementUnit')
 router.register(r'api/product', ProductViewSet, basename='Product')
 router.register(r'api/expiration', ExpirationViewSet, basename='Expiration')
+router.register(r'api/pack', PackHeaderViewSet, basename='PackHeader')
+router.register(r'api/packDetail', PackDetailsViewSet, basename='PackDetail')
 
 urlpatterns = router.urls
 # urlpatterns += [
